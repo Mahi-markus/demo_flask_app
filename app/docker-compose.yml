@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=mahi
+      - POSTGRES_PASSWORD=mahi
+      - POSTGRES_DB=mydatabase
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mahi -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  app:
+    build: .
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://mahi:mahi@db:5432/mydatabase
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:5000"

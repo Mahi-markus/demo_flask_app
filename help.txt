@@ -1,0 +1,22 @@
+docker-compose exec db bash
+
+Login to PostgreSQL: Use the psql tool to connect to the PostgreSQL database:
+
+psql -U mahi -d mydatabase
+
+This connects you to the mydatabase as the mahi user.
+
+
+
+    To list all tables:
+
+\dt
+
+To view the data in a specific table:
+
+SELECT * FROM your_table_name;
+
+
+docker exec -it app-app-1 python -m unittest test_module.py
+
+docker run demo_python-app-1 python3 -m unittest test_api.py
