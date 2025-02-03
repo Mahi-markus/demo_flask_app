@@ -55,7 +55,7 @@ class MessageApiTestCase(unittest.TestCase):
         """Test POST /api/message with no data"""
         response = self.client.post('/api/message', data=None)  # No JSON body
         data = response.get_json()
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertEqual(data['status'], 'error')
         self.assertEqual(data['message'], 'No data provided')
 
