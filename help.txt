@@ -17,6 +17,9 @@ To view the data in a specific table:
 SELECT * FROM your_table_name;
 
 
-docker exec -it app-app-1 python -m unittest test_module.py
+docker exec -it app-app-1 python -m unittest test.test_module
 
-docker run demo_python-app-1 python3 -m unittest test_api.py
+
+docker exec -it app-app-1 coverage run -m unittest discover
+
+docker exec -it app-app-1 coverage report
