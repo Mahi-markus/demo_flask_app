@@ -11,13 +11,16 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
-
-  app:
-    build: .
-    environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://mahi:mahi@db:5432/mydatabase
-    depends_on:
-      db:
-        condition: service_healthy
     ports:
-      - "5000:5000"
+      - "5432:5432"
+
+
+  # app:
+  #   build: .
+  #   environment:
+  #     - SQLALCHEMY_DATABASE_URI=postgresql://mahi:mahi@localhost:5432/mydatabase
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   ports:
+  #     - "5000:5000"

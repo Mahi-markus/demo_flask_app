@@ -2,19 +2,20 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 from config import Config
+from models.model import db, Message 
 
-# Initialize SQLAlchemy without binding to app
-db = SQLAlchemy()
+# # Initialize SQLAlchemy without binding to app
+# db = SQLAlchemy()
 
-class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(200), nullable=False)
+# class Message(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     content = db.Column(db.String(200), nullable=False)
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "content": self.content
-        }
+#     def to_dict(self):
+#         return {
+#             "id": self.id,
+#             "content": self.content
+#         }
 
 def create_app(config_object=Config):
     app = Flask(__name__)

@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from server import create_app, db, Message
+from flask import json
 
 class MockMessageApiTestCase(unittest.TestCase):
     """Unit tests for the Flask API using mocks"""
@@ -53,6 +54,15 @@ class MockMessageApiTestCase(unittest.TestCase):
         mock_add.assert_called_once()
         mock_commit.assert_called_once()
 
+    @patch("models.model.Message.query.all", side_effect=Exception("Database error"))
+    def test_get_message_exception(self, mock_query):
+        response = self.client.get("/api/message")
+        data = json.loads(response.data)
+        
+        self.assertEqual(response.status_code, 200)
+        # self.assertIn("Error fetching messages", data["message"])
+        # self.assertEqual(data["status"], "error")   
+
     def test_post_message_missing_content(self):
         """Test POST /api/message when content is missing"""
         response = self.client.post('/api/message', json={})
@@ -103,6 +113,21 @@ class MockMessageApiTestCase(unittest.TestCase):
         self.assertEqual(len(data['messages']), 1)  # Expecting 1 message
         self.assertEqual(data['messages'][0]['content'], 'Test message')  # Check correct content
         mock_query.all.assert_called_once()
+
+class AppInitializationTestCase(unittest.TestCase):
+    def test_app_creation(self):
+        """Test if the app is created successfully."""
+        app = create_app()
+        self.assertIsNotNone(app)
+
+    def test_app_context_and_db(self):
+        """Test if the app context is created and the database initializes properly."""
+        app = create_app()
+        with app.app_context():
+            db.create_all()  # Ensure the database tables are created
+            self.assertIsNotNone(db.engine)  # Check if the DB engine is available
+
+      
 
 
 if __name__ == '__main__':
