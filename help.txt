@@ -14,7 +14,7 @@ This connects you to the mydatabase as the mahi user.
 
 To view the data in a specific table:
 
-SELECT * FROM your_table_name;
+SELECT * FROM message;
 
 
 docker exec -it app-app-1 python -m unittest test.test_module
