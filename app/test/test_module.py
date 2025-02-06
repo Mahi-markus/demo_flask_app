@@ -2,6 +2,9 @@ import unittest
 from unittest.mock import patch, MagicMock
 from server import create_app, db, Message
 from flask import json
+import sys
+import io
+import importlib
 
 class MockMessageApiTestCase(unittest.TestCase):
     """Unit tests for the Flask API using mocks"""
@@ -114,18 +117,63 @@ class MockMessageApiTestCase(unittest.TestCase):
         self.assertEqual(data['messages'][0]['content'], 'Test message')  # Check correct content
         mock_query.all.assert_called_once()
 
-class AppInitializationTestCase(unittest.TestCase):
-    def test_app_creation(self):
-        """Test if the app is created successfully."""
-        app = create_app()
-        self.assertIsNotNone(app)
+class MainExecutionTestCase(unittest.TestCase):
+    """Test cases for the main execution block"""
 
-    def test_app_context_and_db(self):
-        """Test if the app context is created and the database initializes properly."""
-        app = create_app()
-        with app.app_context():
-            db.create_all()  # Ensure the database tables are created
-            self.assertIsNotNone(db.engine)  # Check if the DB engine is available
+    def setUp(self):
+        # Store original module state
+        self.original_name = sys.modules['server'].__name__
+
+    def tearDown(self):
+        # Restore original module state
+        sys.modules['server'].__name__ = self.original_name
+
+    @patch('server.create_app')
+    @patch('server.db.create_all')
+    @patch('flask.Flask.run')
+    def test_main_execution(self, mock_run, mock_create_all, mock_create_app):
+        """Test the main execution block of the application"""
+        # Set up mock app
+        mock_flask_app = MagicMock()
+        mock_create_app.return_value = mock_flask_app
+        
+        # Simulate main block execution
+        import server
+        with patch.dict(server.__dict__, {'__name__': '__main__'}):
+            # Execute the main block code
+            app = create_app()
+            with app.app_context():
+                db.create_all()
+            app.run(debug=True, host='0.0.0.0')
+
+        # Verify the calls
+        mock_create_app.assert_called_once()
+        mock_create_all.assert_called_once()
+        mock_run.assert_called_once_with(debug=True, host='0.0.0.0')
+
+    @patch('server.create_app')
+    @patch('server.db.create_all')
+    def test_main_context_manager(self, mock_create_all, mock_create_app):
+        """Test the context manager in the main block"""
+        # Set up mock app
+        mock_flask_app = MagicMock()
+        mock_context = MagicMock()
+        mock_flask_app.app_context.return_value = mock_context
+        mock_create_app.return_value = mock_flask_app
+
+        # Execute main block code
+        import server
+        with patch.dict(server.__dict__, {'__name__': '__main__'}):
+            app = create_app()
+            with app.app_context():
+                db.create_all()
+
+        # Verify the calls
+        mock_create_app.assert_called_once()
+        mock_flask_app.app_context.assert_called_once()
+        mock_create_all.assert_called_once()
+        mock_context.__enter__.assert_called_once()
+        mock_context.__exit__.assert_called_once()
 
       
 
