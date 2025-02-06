@@ -83,8 +83,7 @@ class MockMessageApiTestCase(unittest.TestCase):
         """Test POST /api/message with no data"""
         response = self.client.post('/api/message', data=None, content_type='application/json')
         data = response.get_json()
-        
-        self.assertEqual(response.status_code, 500)  # Change expected status to 400
+        self.assertEqual(response.status_code, 500)
         self.assertEqual(data['status'], 'error')
         # self.assertEqual(data['message'], 'No data provided')
 
